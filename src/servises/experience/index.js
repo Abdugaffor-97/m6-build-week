@@ -1,7 +1,29 @@
 const { Router } = require("express");
 const ExperienceModel = require("./schema");
+const fs = require("fs");
+
+const { pipeline } = require("stream");
+const { Transform, parse, AsyncParser } = require("json2csv");
+const { createReadStream } = require("fs-extra");
+const { join } = require("path");
 
 const router = Router();
+
+router.get("/csv", async (req, res, next) => {
+  try {
+    let data = await ExperienceModel.find();
+    console.log(data);
+
+    const json2csvParser = new Json2csvParser({ header: true });
+    const csvData = json2csvParser.parse(data);
+    fs.writeFile("bezkoder_mongodb_fs.csv", csvData, function (error) {
+      if (error) throw error;
+      console.log("Write to bezkoder_mongodb_fs.csv successfully!");
+    });
+  } catch (error) {
+    console.error();
+  }
+});
 
 router
   .route("/")
