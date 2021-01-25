@@ -11,6 +11,7 @@ const {
 
 // Routes
 const experienceRoutes = require("./servises/experience");
+const profileRoute = require("./servises/profile");
 
 const app = express();
 
@@ -32,6 +33,8 @@ const corsOptions = {
 app.use("/api/experience", experienceRoutes);
 
 console.log(listEndpoints(app));
+
+app.use("/profile", profileRoute);
 
 app.use(badRequestHandler);
 app.use(notFoundHandler);
