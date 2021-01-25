@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const listEndpoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
 const {
   badRequestHandler,
@@ -8,12 +9,30 @@ const {
   genericErrorHandler,
 } = require("./errorHandlers");
 
+// Routes
+const experienceRoutes = require("./servises/experience");
 const profileRoute = require("./servises/profile");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+const whiteList = [process.env.FE_URL];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whiteList.indexOf(origin) !== -1) {
+      // Allowed
+      callback(null, true);
+    } else {
+      callback(new Error("NOT Allowed-cors "));
+    }
+  },
+};
+
+// API
+app.use("/api/experience", experienceRoutes);
+
+console.log(listEndpoints(app));
 
 app.use("/profile", profileRoute);
 
