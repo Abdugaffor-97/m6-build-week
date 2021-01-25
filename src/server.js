@@ -8,10 +8,14 @@ const {
   genericErrorHandler,
 } = require("./errorHandlers");
 
+const profileRoute = require("./servises/profile");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/profile", profileRoute);
 
 app.use(badRequestHandler);
 app.use(notFoundHandler);
