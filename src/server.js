@@ -30,11 +30,10 @@ const corsOptions = {
 };
 
 // API
-app.use("/api/experience", experienceRoutes);
+app.use("/experience", experienceRoutes);
+app.use("/profile", profileRoute);
 
 console.log(listEndpoints(app));
-
-app.use("/profile", profileRoute);
 
 app.use(badRequestHandler);
 app.use(notFoundHandler);
