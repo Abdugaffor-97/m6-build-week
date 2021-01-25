@@ -12,6 +12,7 @@ const {
 // Routes
 const experienceRoutes = require("./servises/experience");
 const profileRoute = require("./servises/profile");
+const postRoute = require("./servises/post");
 
 const app = express();
 
@@ -32,6 +33,7 @@ const corsOptions = {
 // API
 app.use("/experience", experienceRoutes);
 app.use("/profile", profileRoute);
+app.use("/posts", postRoute);
 
 console.log(listEndpoints(app));
 

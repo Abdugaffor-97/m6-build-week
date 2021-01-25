@@ -1,0 +1,86 @@
+const express = require("express");
+const PostModel = require("./schema");
+const ProfileModel = require("../profile/schema");
+const q2m = require("query-to-mongo");
+
+const PostRouter = express.Router();
+
+PostRouter.post("/", async (req, res, next) => {
+  try {
+    // const newPost = new PostModel(req.body);
+    // const { _id } = await newPost.save();
+    const newPost = await PostModel.create(req.body)
+    newPost.save()
+    res.status(201).send(newPost);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+PostRouter.get("/", async (req, res, next) => {
+  try {
+    const query = q2m(req.query);
+    const total = await PostModel.countDocuments(query.criteria);
+    const posts = await PostModel.find(query.criteria)
+      .sort(query.options.sort)
+      .skip(query.options.skip)
+      .limit(query.options.limit)
+      .populate("user");
+    res.send({ links: query.links("/posts", total), posts });
+  } catch (error) {
+    next(error);
+  }
+});
+
+PostRouter.get("/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const post = await PostModel.findById(id);
+    if (post) {
+      res.send(post);
+    } else {
+      const error = new Error();
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    console.log(error);
+    next("While reading a problem occurred!");
+  }
+});
+
+PostRouter.put("/:id", async (req, res, next) => {
+  try {
+    const post = await PostModel.findByIdAndUpdate(req.params.id, req.body, {
+      runValidators: true,
+      new: true,
+    });
+    if (post) {
+      res.send(post);
+    } else {
+      const error = new Error(`Post with id ${req.params.id} not found`);
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+PostRouter.delete("/:id", async (req, res, next) => {
+  try {
+    const post = await PostModel.findByIdAndDelete(req.params.id);
+    if (post) {
+      res.send("Deleted");
+    } else {
+      const error = new Error(`Post with id ${req.params.id} not found`);
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = PostRouter;
