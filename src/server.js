@@ -4,9 +4,11 @@ const cors = require("cors");
 const listEndpoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
 const {
-  badRequestHandler,
-  notFoundHandler,
-  genericErrorHandler,
+  badRequestErrorHandler,
+  notFoundErrorHandler,
+  unauthorizedErrorHandler,
+  forbiddenErrorHandler,
+  catchAllErrorHandler,
 } = require("./errorHandlers");
 
 // Routes
@@ -37,9 +39,11 @@ app.use("/posts", postRoute);
 
 console.log(listEndpoints(app));
 
-app.use(badRequestHandler);
-app.use(notFoundHandler);
-app.use(genericErrorHandler);
+app.use(badRequestErrorHandler);
+app.use(notFoundErrorHandler);
+app.use(forbiddenErrorHandler);
+app.use(unauthorizedErrorHandler);
+app.use(catchAllErrorHandler);
 
 const port = process.env.PORT;
 mongoose
