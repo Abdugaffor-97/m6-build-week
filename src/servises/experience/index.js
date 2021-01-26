@@ -9,8 +9,8 @@ const router = Router();
 
 router.get("/csv", async (req, res, next) => {
   try {
-    const experience = await ExperienceModel.find();
-    console.log(experience);
+    const experience = await ExperienceModel.find().lean();
+
     stringify(experience, { header: true }).pipe(res);
     res.setHeader("Content-Type", "text/csv");
     res.setHeader(
