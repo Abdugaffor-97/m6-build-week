@@ -1,27 +1,22 @@
 const { Router } = require("express");
 const ExperienceModel = require("./schema");
-const fs = require("fs");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 const cloudinary = require("../../cloudinaryConfig");
-const { pipeline } = require("stream");
-const { Transform, parse, AsyncParser } = require("json2csv");
-const { createReadStream } = require("fs-extra");
-const { join } = require("path");
+const stringify = require("csv-stringify");
 
 const router = Router();
 
 router.get("/csv", async (req, res, next) => {
   try {
-    let data = await ExperienceModel.find();
-    console.log(data);
+    const experience = await ExperienceModel.find().lean();
 
-    const json2csvParser = new Json2csvParser({ header: true });
-    const csvData = json2csvParser.parse(data);
-    fs.writeFile("bezkoder_mongodb_fs.csv", csvData, function (error) {
-      if (error) throw error;
-      console.log("Write to bezkoder_mongodb_fs.csv successfully!");
-    });
+    stringify(experience, { header: true }).pipe(res);
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="' + "experiences" + '.csv"'
+    );
   } catch (error) {
     console.error();
   }
@@ -109,7 +104,7 @@ router
         res.status(200).send(addPicture);
       } else {
         const err = new Error();
-        err.message = `Profile Id: ${req.params.id} not found`;
+        err.message = `Experience Id: ${req.params.id} not found`;
         err.httpStatusCode = 404;
         next(err);
       }
