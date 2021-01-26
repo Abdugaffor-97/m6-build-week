@@ -65,7 +65,8 @@ router
     try {
       const experience = await ExperienceModel.findByIdAndUpdate(
         req.params.id,
-        req.body
+        req.body,
+        { runValidators: true, new: true }
       );
       res.send(experience);
     } catch (error) {

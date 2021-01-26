@@ -55,7 +55,7 @@ router
       next(error);
     }
   })
-  .post(async (req, res, next) => {
+  .put(async (req, res, next) => {
     try {
       const modifiedProfile = await ProfileModel.findByIdAndUpdate(
         req.params.id,
