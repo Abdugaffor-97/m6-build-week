@@ -29,7 +29,7 @@ router
       const experiences = await ExperienceModel.find({
         profileId: req.params.profileId,
       });
-      ExperienceModel.find;
+
       res.send(experiences);
     } catch (error) {
       console.log(error);
