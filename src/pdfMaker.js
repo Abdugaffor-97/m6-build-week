@@ -4,10 +4,10 @@ const { join } = require("path");
 
 const buildPdfAsync = async (pdfStream) =>
   new Promise((resolve, reject) => {
-    const chuncks = [];
+    const chunks = [];
     pdfStream.on("data", (chunk) => {
-      console.log(chunk);
-      chuncks.push(chunk);
+      //   console.log(chunk);
+      chunks.push(chunk);
     });
 
     pdfStream.on("error", (err) => reject(err));
@@ -17,9 +17,9 @@ const buildPdfAsync = async (pdfStream) =>
     pdfStream.end();
   });
 
-const generatePdf = async (data, docDefinition) => {
+const generatePdf = (docDefinition) => {
   try {
-    console.log(data);
+    // console.log(data);
     const fonts = {
       Roboto: {
         normal: "Helvetica",
@@ -29,14 +29,17 @@ const generatePdf = async (data, docDefinition) => {
 
     const pdfDoc = printer.createPdfKitDocument(docDefinition);
 
-    const pdfBuffer = await buildPdfAsync(pdfDoc);
-    const pdfPath = join(__dirname, "LinkedInProfile.pdf");
+    /**
+     * 
+     * const pdfBuffer = await buildPdfAsync(pdfDoc);
+    const pdfPath = join(__dirname, "../public/LinkedInProfile.pdf");
+
     await writeFile(pdfPath, pdfBuffer);
 
-    return pdfPath;
+     */
+    return pdfDoc;
   } catch (error) {
     console.log(error);
-    next(error);
   }
 };
 

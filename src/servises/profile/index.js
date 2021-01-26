@@ -3,6 +3,7 @@ const ProfileModel = require("./schema");
 const multer = require("multer");
 const cloudinary = require("../../cloudinaryConfig");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const generatePdf = require("../../pdfMaker");
 
 const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -118,6 +119,28 @@ router
   });
 router.route("/:id/CV").get(async (req, res, next) => {
   try {
+    const Profile = await ProfileModel.findById(req.params.id);
+
+    const pdfDefinition = {
+      content: [
+        `Name: ${Profile.name}`,
+        `Surname: ${Profile.surname}`,
+        `Email: ${Profile.email}`,
+        `Bio: ${Profile.bio}`,
+        `Title: ${Profile.title}`,
+        `Username: ${Profile.username}`,
+        `Area: ${Profile.area}`,
+      ],
+    };
+    const pdfStream = generatePdf(pdfDefinition);
+
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=LinkedInProfile.pdf"
+    );
+
+    pdfStream.pipe(res);
+    pdfStream.end();
   } catch (error) {
     console.log(error);
     next(error);
