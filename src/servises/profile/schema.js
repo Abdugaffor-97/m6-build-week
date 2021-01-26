@@ -13,7 +13,7 @@ const ProfileSchema = new Schema(
       default:
         "https://www.kindpng.com/picc/m/78-785827_user-profile-avatar-login-account-male-user-icon.png",
     },
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true, dropDups: true },
   },
   { timestamps: true }
 );
