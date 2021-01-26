@@ -23,10 +23,12 @@ router.get("/csv", async (req, res, next) => {
 });
 
 router
-  .route("/")
+  .route("/:profileId")
   .get(async (req, res, next) => {
     try {
-      const experiences = await ExperienceModel.find();
+      const experiences = await ExperienceModel.find({
+        profileId: req.params.profileId,
+      });
       ExperienceModel.find;
       res.send(experiences);
     } catch (error) {
@@ -36,7 +38,10 @@ router
   })
   .post(async (req, res, next) => {
     try {
-      const newExperience = await ExperienceModel.create(req.body);
+      const newExperience = await ExperienceModel.create({
+        ...req.body,
+        profileId: req.params.profileId,
+      });
       newExperience.save();
       res.send(newExperience);
     } catch (error) {
