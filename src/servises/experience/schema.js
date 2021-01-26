@@ -8,7 +8,11 @@ const ExperienceSchema = new Schema({
   description: { type: String },
   area: { type: String },
   username: { type: String },
-  image: { type: String },
+  image: {
+    type: String,
+    default:
+      "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+  },
 });
 
 module.exports = model("experience", ExperienceSchema);
