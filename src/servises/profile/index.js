@@ -116,4 +116,11 @@ router
       next(error);
     }
   });
+router.route("/:id/CV").get(async (req, res, next) => {
+  try {
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 module.exports = router;
