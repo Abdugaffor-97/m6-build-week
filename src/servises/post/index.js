@@ -2,8 +2,20 @@ const express = require("express");
 const PostModel = require("./schema");
 const ProfileModel = require("../profile/schema");
 const q2m = require("query-to-mongo");
+const multer = require("multer");
+const cloudinary = require("../../cloudinaryConfig");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const PostRouter = express.Router();
+const cloudStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "profiles",
+  },
+});
+
+const cloudMulter = multer({ storage: cloudStorage });
+
+const PostRouter = express.Router()
 
 PostRouter.post("/", async (req, res, next) => {
   try {
@@ -75,12 +87,36 @@ PostRouter.delete("/:id", async (req, res, next) => {
       res.send("Deleted");
     } else {
       const error = new Error(`Post with id ${req.params.id} not found`);
-      error.httpStatusCode = 404;
+      error.httpStatusCode = 404
       next(error);
     }
   } catch (error) {
     next(error);
   }
 });
+
+PostRouter
+  .route("/:id/postPicture")
+  .post(cloudMulter.single("post"), async (req, res, next) => {
+    try {
+      const addPicture = await PostModel.findByIdAndUpdate(req.params.id, {
+        $set: {
+          image: req.file.path,
+        },
+      });
+      console.log('hello')
+      if (addPicture) {
+        res.status(200).send('posted');
+      } else {
+        const err = new Error();
+        err.message = `Post Id: ${req.params.id} not found`;
+        err.httpStatusCode = 404;
+        next(err);
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  });
 
 module.exports = PostRouter;
