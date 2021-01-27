@@ -94,7 +94,7 @@ const cloudStorage = new CloudinaryStorage({
 const cloudMulter = multer({ storage: cloudStorage });
 
 router
-  .route("/:id/pictute")
+  .route("/:id/picture")
   .post(cloudMulter.single("experience"), async (req, res, next) => {
     try {
       const addPicture = await ExperienceModel.findByIdAndUpdate(

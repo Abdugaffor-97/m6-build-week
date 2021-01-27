@@ -15,14 +15,15 @@ const cloudStorage = new CloudinaryStorage({
 
 const cloudMulter = multer({ storage: cloudStorage });
 
-const PostRouter = express.Router()
+const PostRouter = express.Router();
 
 PostRouter.post("/", async (req, res, next) => {
   try {
     // const newPost = new PostModel(req.body);
     // const { _id } = await newPost.save();
-    const newPost = await PostModel.create(req.body)
-    newPost.save()
+    const newPost = await PostModel.create(req.body);
+
+    newPost.save();
     res.status(201).send(newPost);
   } catch (error) {
     console.log(error);
@@ -87,7 +88,7 @@ PostRouter.delete("/:id", async (req, res, next) => {
       res.send("Deleted");
     } else {
       const error = new Error(`Post with id ${req.params.id} not found`);
-      error.httpStatusCode = 404
+      error.httpStatusCode = 404;
       next(error);
     }
   } catch (error) {
@@ -95,18 +96,18 @@ PostRouter.delete("/:id", async (req, res, next) => {
   }
 });
 
-PostRouter
-  .route("/:id/postPicture")
-  .post(cloudMulter.single("post"), async (req, res, next) => {
+PostRouter.route("/:id/postPicture").post(
+  cloudMulter.single("post"),
+  async (req, res, next) => {
     try {
       const addPicture = await PostModel.findByIdAndUpdate(req.params.id, {
         $set: {
           image: req.file.path,
         },
       });
-      console.log('hello')
+      console.log(req.file.path);
       if (addPicture) {
-        res.status(200).send('posted');
+        res.status(200).send("posted");
       } else {
         const err = new Error();
         err.message = `Post Id: ${req.params.id} not found`;
@@ -117,6 +118,7 @@ PostRouter
       console.log(error);
       next(error);
     }
-  });
+  }
+);
 
 module.exports = PostRouter;
