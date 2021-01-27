@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-
+const md5 = require("md5");
 const ProfileSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -14,9 +14,15 @@ const ProfileSchema = new Schema(
         "https://www.kindpng.com/picc/m/78-785827_user-profile-avatar-login-account-male-user-icon.png",
     },
     username: { type: String, required: true, unique: true, dropDups: true },
+    password: { type: String, required: true },
   },
   { timestamps: true }
 );
+
+ProfileSchema.pre("save", function (next) {
+  this.password = md5(this.password);
+  next();
+});
 
 const ProfileModel = model("Profile", ProfileSchema);
 

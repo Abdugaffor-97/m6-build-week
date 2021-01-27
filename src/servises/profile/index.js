@@ -3,6 +3,8 @@ const ProfileModel = require("./schema");
 const multer = require("multer");
 const cloudinary = require("../../cloudinaryConfig");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+const auth = require("../middleware/auth");
 const generatePdf = require("../../pdfMaker");
 
 const cloudStorage = new CloudinaryStorage({
@@ -37,6 +39,15 @@ router
       next(error);
     }
   });
+
+router.get("/me", auth, async (req, res, next) => {
+  try {
+    res.status(200).send(req.user);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 
 router
   .route("/:id")
