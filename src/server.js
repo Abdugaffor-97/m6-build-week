@@ -15,7 +15,7 @@ const {
 const experienceRoutes = require("./servises/experience");
 const profileRoute = require("./servises/profile");
 const postRoute = require("./servises/post");
-const reactionRoute = require("./servises/reactions");
+const commentRoute = require("./servises/comments");
 
 const app = express();
 
@@ -37,7 +37,7 @@ const corsOptions = {
 app.use("/experience", experienceRoutes);
 app.use("/profile", profileRoute);
 app.use("/posts", postRoute);
-app.use("/reactions", reactionRoute);
+app.use("/comments", commentRoute);
 
 console.log(listEndpoints(app));
 

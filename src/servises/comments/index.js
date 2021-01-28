@@ -1,13 +1,19 @@
 const { Router } = require("express");
 const CommentModel = require("./schema");
+const mongoose = require("mongoose");
 
 const router = Router();
 
 router
-  .route("/")
+  .route("/:postId")
   .get(async (req, res, next) => {
     try {
-      const comments = await CommentModel.find();
+      const comments = await CommentModel.find({
+        post: req.params.postId,
+      }).populate({
+        path: "user",
+        select: "_id name surname image username title",
+      });
 
       res.send(comments);
     } catch (error) {
@@ -17,7 +23,10 @@ router
   })
   .post(async (req, res, next) => {
     try {
-      const newComment = await CommentModel.create(req.body);
+      const newComment = await CommentModel.create({
+        ...req.body,
+        post: mongoose.Types.ObjectId(req.params.postId),
+      });
       newComment.save();
       res.send(newComment);
     } catch (error) {
