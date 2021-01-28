@@ -7,9 +7,11 @@ const stringify = require("csv-stringify");
 
 const router = Router();
 
-router.get("/csv", async (req, res, next) => {
+router.get("/:profileId/csv", async (req, res, next) => {
   try {
-    const experience = await ExperienceModel.find().lean();
+    const experience = await ExperienceModel.find({
+      profileId: req.params.profileId,
+    }).lean();
 
     stringify(experience, { header: true }).pipe(res);
     res.setHeader("Content-Type", "text/csv");
@@ -19,6 +21,7 @@ router.get("/csv", async (req, res, next) => {
     );
   } catch (error) {
     console.error();
+    next(error);
   }
 });
 

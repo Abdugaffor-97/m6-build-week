@@ -37,7 +37,7 @@ PostRouter.get("/", async (req, res, next) => {
       .sort(query.options.sort)
       .skip(query.options.skip)
       .limit(query.options.limit)
-      .populate("user");
+      .populate(["user", "reactions.user"]);
     res.send({
       links: query.links("/posts", total),
       posts,
@@ -61,7 +61,7 @@ PostRouter.get("/:id", async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    next("While reading a problem occurred!");
+    next(error);
   }
 });
 
@@ -123,4 +123,34 @@ PostRouter.route("/:id/postPicture").post(
   }
 );
 
+PostRouter.post("/:postId/:userId/addReaction", async (req, res, next) => {
+  try {
+    const isReactionThere = await PostModel.findOne({
+      _id: req.params.postId,
+      "reactions.user": req.params.userId,
+    });
+
+    console.log(isReactionThere);
+    if (isReactionThere) {
+      const modifyReaction = await PostModel.findOneAndUpdate(
+        {
+          _id: req.params.postId,
+          "reactions.user": req.params.userId,
+        },
+        {
+          "reactions.$.reaction": req.body.reaction,
+        }
+      );
+      res.status(200).send(modifyReaction);
+    } else {
+      const newReaction = await PostModel.findByIdAndUpdate(req.params.postId, {
+        $push: { reactions: { ...req.body, user: req.params.userId } },
+      });
+      res.status(201).send(newReaction);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 module.exports = PostRouter;
