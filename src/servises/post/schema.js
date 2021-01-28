@@ -7,6 +7,13 @@ const PostSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "Profile" },
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     image: { type: String },
+    reactions: [
+      {
+        _id: false,
+        user: { type: Schema.Types.ObjectId, ref: "Profile" },
+        reaction: Number,
+      },
+    ],
   },
   { timestamps: true }
 );
