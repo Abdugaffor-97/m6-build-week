@@ -4,6 +4,7 @@ const q2m = require("query-to-mongo");
 const multer = require("multer");
 const cloudinary = require("../../cloudinaryConfig");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const mongoose = require("mongoose");
 
 const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -34,15 +35,17 @@ PostRouter.get("/", async (req, res, next) => {
     const query = q2m(req.query);
     const total = await PostModel.countDocuments(query.criteria);
     const posts = await PostModel.find(query.criteria)
-      .sort(query.options.sort)
+      .sort({ createdAt: -1 })
       .skip(query.options.skip)
       .limit(query.options.limit)
-      .populate(["user", "reactions.user"]);
+      .populate([
+        { path: "user", select: "name surname image _id title" },
+        { path: "reactions.user", select: "name surname image _id" },
+      ]);
     res.send({
       links: query.links("/posts", total),
       posts,
     });
-    console.log(posts);
   } catch (error) {
     next(error);
   }
@@ -51,7 +54,10 @@ PostRouter.get("/", async (req, res, next) => {
 PostRouter.get("/:id", async (req, res, next) => {
   try {
     const id = req.params.id;
-    const post = await PostModel.findById(id);
+    const post = await PostModel.findById(id).populate([
+      { path: "user", select: "name surname image _id title" },
+      { path: "reactions.user", select: "name surname image _id" },
+    ]);
     if (post) {
       res.send(post);
     } else {
@@ -148,6 +154,26 @@ PostRouter.post("/:postId/:userId/addReaction", async (req, res, next) => {
       });
       res.status(201).send(newReaction);
     }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+PostRouter.delete("/:postId/:userId/removeReaction", async (req, res, next) => {
+  try {
+    await PostModel.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $pull: {
+          reactions: {
+            user: mongoose.Types.ObjectId(req.params.userId),
+          },
+        },
+      },
+      { runValidators: true, new: true }
+    );
+    res.status(203).send("Reaction is removed");
   } catch (error) {
     console.log(error);
     next(error);

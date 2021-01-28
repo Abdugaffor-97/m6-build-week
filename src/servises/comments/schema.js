@@ -4,6 +4,7 @@ const CommentSchema = new Schema(
   {
     text: { type: String },
     user: { type: Schema.Types.ObjectId, ref: "Profile" },
+    post: { type: Schema.Types.ObjectId },
   },
   { timestamps: true }
 );
