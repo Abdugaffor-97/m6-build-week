@@ -37,7 +37,7 @@ PostRouter.get("/", async (req, res, next) => {
       .sort(query.options.sort)
       .skip(query.options.skip)
       .limit(query.options.limit)
-      .populate("user");
+      .populate(["user", "reactions.user"]);
     res.send({
       links: query.links("/posts", total),
       posts,
@@ -61,7 +61,7 @@ PostRouter.get("/:id", async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    next("While reading a problem occurred!");
+    next(error);
   }
 });
 
