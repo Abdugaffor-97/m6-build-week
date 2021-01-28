@@ -1,6 +1,5 @@
 const express = require("express");
 const PostModel = require("./schema");
-const ProfileModel = require("../profile/schema");
 const q2m = require("query-to-mongo");
 const multer = require("multer");
 const cloudinary = require("../../cloudinaryConfig");
@@ -22,7 +21,6 @@ PostRouter.post("/", async (req, res, next) => {
     // const newPost = new PostModel(req.body);
     // const { _id } = await newPost.save();
     const newPost = await PostModel.create(req.body);
-
     newPost.save();
     res.status(201).send(newPost);
   } catch (error) {
@@ -40,7 +38,11 @@ PostRouter.get("/", async (req, res, next) => {
       .skip(query.options.skip)
       .limit(query.options.limit)
       .populate("user");
-    res.send({ links: query.links("/posts", total), posts });
+    res.send({
+      links: query.links("/posts", total),
+      posts,
+    });
+    console.log(posts);
   } catch (error) {
     next(error);
   }
@@ -105,7 +107,7 @@ PostRouter.route("/:id/postPicture").post(
           image: req.file.path,
         },
       });
-      console.log(req.file.path);
+      console.log("hello");
       if (addPicture) {
         res.status(200).send("posted");
       } else {
