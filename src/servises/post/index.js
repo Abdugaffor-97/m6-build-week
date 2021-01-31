@@ -40,7 +40,7 @@ PostRouter.get("/", async (req, res, next) => {
       .limit(query.options.limit)
       .populate([
         { path: "user", select: "username name surname image _id title" },
-        { path: "reactions.user", select: "name surname image _id" },
+        { path: "reactions.user", select: "name surname image _id title" },
       ]);
     res.send({
       links: query.links("/posts", total),
@@ -56,7 +56,7 @@ PostRouter.get("/:id", async (req, res, next) => {
     const id = req.params.id;
     const post = await PostModel.findById(id).populate([
       { path: "user", select: "username name surname image _id title " },
-      { path: "reactions.user", select: "name surname image _id" },
+      { path: "reactions.user", select: "name surname image _id title" },
     ]);
     if (post) {
       res.send(post);
