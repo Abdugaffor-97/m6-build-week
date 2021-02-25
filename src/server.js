@@ -10,14 +10,17 @@ const {
   forbiddenErrorHandler,
   catchAllErrorHandler,
 } = require("./errorHandlers");
+const { PORT, DATABASE_URL } = process.env;
 
 // Routes
-const experienceRoutes = require("./servises/experience");
-const profileRoute = require("./servises/profile");
-const postRoute = require("./servises/post");
-const commentRoute = require("./servises/comments");
+const apis = require("./servises");
+
+const http = require("http");
+const createSocketServer = require("./socket");
 
 const app = express();
+const httpServer = http.createServer(app);
+createSocketServer(httpServer);
 
 app.use(cors());
 app.use(express.json());
@@ -34,10 +37,7 @@ const corsOptions = {
 };
 
 // API
-app.use("/experience", experienceRoutes);
-app.use("/profile", profileRoute);
-app.use("/posts", postRoute);
-app.use("/comments", commentRoute);
+app.use("/api", apis);
 
 console.log(listEndpoints(app));
 
@@ -47,19 +47,25 @@ app.use(forbiddenErrorHandler);
 app.use(unauthorizedErrorHandler);
 app.use(catchAllErrorHandler);
 
-const port = process.env.PORT;
 mongoose
-  .connect(process.env.DATABASE_URL, {
+  .connect(DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   .then(
-    app.listen(port, () => {
+    httpServer.listen(PORT, () => {
       if (process.env.NODE_ENV === "production") {
-        console.log("Running on cloud on port", port);
+        console.log("Running on cloud on port", PORT);
       } else {
-        console.log(`Running locally on url http://localhost:${port}`);
+        console.log(`Running locally on url http://localhost:${PORT}`);
       }
     })
   )
-  .catch((error) => console.log(error));
+  .catch((error) =>
+    console.log(`
+    Mongo Connection Error 
+=============================================================>
+  ${error}
+  `)
+  );
